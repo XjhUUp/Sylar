@@ -85,8 +85,7 @@
 
 #define SYLAR_LOG_FMT_DEBUG(logger, fmt, ...) SYLAR_LOG_FMT_LEVEL(logger, sylar::LogLevel::DEBUG, fmt, __VA_ARGS__)
 
-namespace sylar {
-
+namespace sylar{
 /**
  * @brief 日志级别
  */
@@ -245,10 +244,9 @@ private:
 /**
  * @brief 日志格式化
  */
-class LogFormatter {
+class LogFormatter{
 public:
     typedef std::shared_ptr<LogFormatter> ptr;
-
     /**
      * @brief 构造函数
      * @param[in] pattern 格式模板，参考sylar与log4cpp
@@ -302,7 +300,6 @@ public:
      * @brief 获取pattern
      */
     std::string getPattern() const { return m_pattern; }
-
 public:
     /**
      * @brief 日志内容格式化项，虚基类，用于派生出不同的格式化项
@@ -321,7 +318,6 @@ public:
          */
         virtual void format(std::ostream &os, LogEvent::ptr event) = 0;
     };
-
 private:
     /// 日志格式模板
     std::string m_pattern;
@@ -329,7 +325,8 @@ private:
     std::vector<FormatItem::ptr> m_items;
     /// 是否出错
     bool m_error = false;
-};
+
+}
 
 /**
  * @brief 日志输出地，虚基类，用于派生出不同的LogAppender
@@ -339,24 +336,20 @@ class LogAppender {
 public:
     typedef std::shared_ptr<LogAppender> ptr;
     typedef Spinlock MutexType;
-
     /**
      * @brief 构造函数
      * @param[in] default_formatter 默认日志格式器
      */
     LogAppender(LogFormatter::ptr default_formatter);
-    
     /**
      * @brief 析构函数
      */
     virtual ~LogAppender() {}
-
     /**
      * @brief 设置日志格式器
      */
     void setFormatter(LogFormatter::ptr val);
-
-    /**
+        /**
      * @brief 获取日志格式器
      */
     LogFormatter::ptr getFormatter();
@@ -370,7 +363,6 @@ public:
      * @brief 将日志输出目标的配置转成YAML String
      */
     virtual std::string toYamlString() = 0;
-
 protected:
     /// Mutex
     MutexType m_mutex;
@@ -378,7 +370,8 @@ protected:
     LogFormatter::ptr m_formatter;
     /// 默认日志格式器
     LogFormatter::ptr m_defaultFormatter;
-};
+
+}
 
 /**
  * @brief 输出到控制台的Appender
@@ -533,6 +526,35 @@ public:
      * @details 日志事件在析构时由日志器进行输出
      */
     ~LogEventWrap();
+    /**
+     * @brief 获取日志事件
+     */
+    LogEvent::ptr getLogEvent() const { return m_event; }
+
+private:
+    /// 日志器
+    Logger::ptr m_logger;
+    /// 日志事件
+    LogEvent::ptr m_event;
+};
+
+/**
+ * @brief 日志事件包装器，方便宏定义，内部包含日志事件和日志器
+ */
+class LogEventWrap{
+public:
+    /**
+     * @brief 构造函数
+     * @param[in] logger 日志器 
+     * @param[in] event 日志事件
+     */
+    LogEventWrap(Logger::ptr logger, LogEvent::ptr event);
+
+    /**
+     * @brief 析构函数
+     * @details 日志事件在析构时由日志器进行输出
+     */
+    ~LogEventWrap();
 
     /**
      * @brief 获取日志事件
@@ -593,3 +615,5 @@ typedef sylar::Singleton<LoggerManager> LoggerMgr;
 } // end namespace sylar
 
 #endif // __SYLAR_LOG_H__
+
+
